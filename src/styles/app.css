@@ -288,3 +288,34 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .row-2 { align-items: end; }
 .row-2 .input { min-width: 0; width: 100%; }
 input[type='date'].input { min-width: 0; -webkit-appearance: none; appearance: none; }
+
+/* ======================================================================
+   Phase 2: expenses
+   ====================================================================== */
+.snap { display: grid; gap: 4px; justify-items: center; }
+.snap-btn {
+  display: grid; place-items: center; gap: 8px; width: 100%; min-height: 132px;
+  border: 2px dashed var(--green-dark); border-radius: var(--radius);
+  background: #eef7ec; color: #2c5e22; font-size: 1.1rem; cursor: pointer;
+  transition: transform 150ms ease;
+}
+.snap-btn:active { transform: scale(0.99); }
+.snap-btn:disabled { opacity: 0.7; cursor: progress; }
+
+.receipt-preview { display: grid; gap: 10px; padding: 10px; justify-items: center; }
+.receipt-preview img { display: block; max-width: 100%; max-height: 280px; border-radius: 8px; object-fit: contain; background: var(--off-white); }
+.receipt-preview-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+.cat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 600px) { .cat-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.cat {
+  display: grid; justify-items: center; align-content: center; gap: 4px;
+  min-height: 76px; padding: 8px 4px; border: 1px solid #c9ccc9; border-radius: 12px;
+  background: var(--white); font-size: 0.8rem; font-weight: 600; line-height: 1.15; text-align: center; cursor: pointer;
+}
+.cat.is-active { background: #eef7ec; border-color: var(--green-dark); color: #2c5e22; box-shadow: inset 0 0 0 1px var(--green-dark); }
+
+.thumb { flex: none; width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--off-white); display: grid; place-items: center; color: var(--grey); }
+.thumb-empty { border: 1px dashed var(--line); }
+.pill-inline { justify-self: start; margin-top: 2px; font-size: 0.72rem; }
+.filters { align-items: stretch; }

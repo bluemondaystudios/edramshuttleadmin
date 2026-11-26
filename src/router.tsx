@@ -7,6 +7,8 @@ import { HomePage } from './features/dashboard/HomePage';
 import { InvoicesPage } from './features/invoices/InvoicesPage';
 import { InvoiceEditorPage } from './features/invoices/InvoiceEditor';
 import { ExpensesPage } from './features/expenses/ExpensesPage';
+import { LogExpensePage } from './features/expenses/LogExpensePage';
+import { ExpenseDetail } from './features/expenses/ExpenseDetail';
 import { MorePage } from './features/more/MorePage';
 import { CustomersPage } from './features/customers/CustomersPage';
 import { CustomerDetail } from './features/customers/CustomerDetail';
@@ -43,6 +45,8 @@ export const router = createHashRouter([
       { path: 'vehicles', element: <VehiclesPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'expenses', element: <ExpensesPage /> },
+      { path: 'expenses/new', element: <LogExpensePage /> },
+      { path: 'expenses/:id', element: <ExpenseDetail /> },
       { path: 'more', element: <MorePage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],

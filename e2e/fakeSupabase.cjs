@@ -51,7 +51,9 @@ function createFakeSupabase({ today }) {
     invoices: () => ({ id: uuid(), seq: null, number: null, status: 'draft', customer_snapshot: null, seller_snapshot: null, issue_date: null, due_date: null, notes: null, total_cents: 0, void_reason: null, voided_at: null, created_at: now(), updated_at: now() }),
     invoice_lines: () => ({ id: uuid(), position: 0, service_date: null, vehicle_id: null, quantity: 1 }),
     payments: () => ({ id: uuid(), paid_on: today, method: 'eft', reference: null, notes: null, created_at: now() }),
+    expenses: () => ({ id: uuid(), spent_on: today, vehicle_id: null, supplier: null, description: null, payment_method: 'card', receipt_path: null, deleted_at: null, created_at: now(), updated_at: now() }),
   };
+  const storage = new Map(); // 'bucket/path' -> { bytes: Buffer, contentType }
 
   // ---- query parsing ----
   function parseFilters(params) {
@@ -154,11 +156,33 @@ function createFakeSupabase({ today }) {
   };
 
   // ---- HTTP handler ----
-  function handle({ method, url, headers, body }) {
+  function handle({ method, url, headers, body, bodyBuffer }) {
     const u = new URL(url);
     const path = u.pathname;
     const json = (status, data) => ({ status, body: data === undefined ? '' : JSON.stringify(data) });
     try {
+      // ---- Storage: upload (raw bytes), signed links, signed downloads ----
+      const signGet = /^\/storage\/v1\/object\/sign\/([^/]+)\/(.+)$/.exec(path);
+      if (method === 'GET' && signGet) {
+        const obj = storage.get(`${signGet[1]}/${decodeURIComponent(signGet[2])}`);
+        if (!obj) return json(404, { message: 'Object not found' });
+        return { status: 200, body: obj.bytes, contentType: obj.contentType };
+      }
+      const signBatch = /^\/storage\/v1\/object\/sign\/([^/]+)$/.exec(path);
+      if (method === 'POST' && signBatch) {
+        const { paths } = JSON.parse(body);
+        return json(200, paths.map((p) => (storage.has(`${signBatch[1]}/${p}`)
+          ? { path: p, signedURL: `/object/sign/${signBatch[1]}/${p}?token=fake`, error: null }
+          : { path: p, signedURL: null, error: 'Object not found' })));
+      }
+      const upload = /^\/storage\/v1\/object\/([^/]+)\/(.+)$/.exec(path);
+      if ((method === 'POST' || method === 'PUT') && upload) {
+        const key = `${upload[1]}/${decodeURIComponent(upload[2])}`;
+        if (storage.has(key) && method === 'POST' && headers['x-upsert'] !== 'true') return json(400, { statusCode: '409', error: 'Duplicate', message: 'The resource already exists' });
+        storage.set(key, { bytes: bodyBuffer ?? Buffer.from(body ?? ''), contentType: headers['content-type'] || 'application/octet-stream' });
+        return json(200, { Key: key, Id: uuid() });
+      }
+
       if (path.startsWith('/auth/v1/token')) {
         const exp = Math.floor(Date.now() / 1000) + 3600;
         return json(200, { access_token: 'fake.' + Buffer.from(JSON.stringify({ sub: user.id, exp })).toString('base64url') + '.sig', token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token: 'r', user });
@@ -198,7 +222,8 @@ function createFakeSupabase({ today }) {
       if (method === 'POST') {
         const input = JSON.parse(body);
         const list = Array.isArray(input) ? input : [input];
-        const created = list.map((r) => {
+        const ignoreDup = (headers.prefer || '').includes('resolution=ignore-duplicates');
+        const created = list.filter((r) => !(ignoreDup && r.id && db[name].some((x) => x.id === r.id))).map((r) => {
           const row = { ...(defaults[name]?.() ?? {}), ...r };
           beforeInsert(name, row);
           db[name].push(row);
@@ -227,7 +252,7 @@ function createFakeSupabase({ today }) {
     }
   }
 
-  return { handle, db, user };
+  return { handle, db, user, storage };
 }
 
 module.exports = { createFakeSupabase };

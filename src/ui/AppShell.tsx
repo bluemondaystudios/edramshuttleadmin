@@ -4,6 +4,7 @@ import { Icon, type IconName } from './Icon';
 import { Logo } from './Logo';
 import { Sheet } from './Sheet';
 import { useOnline } from '../lib/useOnline';
+import { useExpenseSync } from '../lib/expensesApi';
 
 const TABS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/', label: 'Home', icon: 'home', end: true },
@@ -14,8 +15,8 @@ const TABS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
 
 const QUICK_ACTIONS: { label: string; hint: string; icon: IconName; to?: string }[] = [
   { label: 'New invoice', hint: 'Bill a customer', icon: 'invoice', to: '/invoices/new' },
+  { label: 'Log expense', hint: 'Snap the slip; works without signal', icon: 'camera', to: '/expenses/new' },
   { label: 'Record payment', hint: 'Money received for an invoice', icon: 'cash', to: '/invoices?filter=unpaid&for=payment' },
-  { label: 'Log expense', hint: 'Coming in the expenses update', icon: 'receipt' },
 ];
 
 function TabLink({ to, label, icon, end }: (typeof TABS)[number]) {
@@ -30,6 +31,7 @@ function TabLink({ to, label, icon, end }: (typeof TABS)[number]) {
 export function AppShell() {
   const online = useOnline();
   const navigate = useNavigate();
+  useExpenseSync(); // upload expenses saved without signal
   const [quickOpen, setQuickOpen] = useState(false);
   const [first, second, third, fourth] = TABS as [typeof TABS[number], typeof TABS[number], typeof TABS[number], typeof TABS[number]];
 
@@ -49,7 +51,7 @@ export function AppShell() {
       {!online ? (
         <div className="offline-banner" role="status">
           <Icon name="wifiOff" size={18} />
-          You're offline. Changes can't be saved right now.
+          You're offline. Expenses still save; other changes need signal.
         </div>
       ) : null}
 

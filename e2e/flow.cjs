@@ -31,8 +31,8 @@ let failPage = null;
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, serviceWorkers: 'block', acceptDownloads: true });
   await ctx.route('**/demo.supabase.co/**', async (route) => {
     const req = route.request();
-    const res = fake.handle({ method: req.method(), url: req.url(), headers: req.headers(), body: req.postData() });
-    await route.fulfill({ status: res.status, contentType: 'application/json', body: res.body });
+    const res = fake.handle({ method: req.method(), url: req.url(), headers: req.headers(), body: req.postData(), bodyBuffer: req.postDataBuffer() });
+    await route.fulfill({ status: res.status, contentType: res.contentType ?? 'application/json', body: res.body });
   });
   const page = await ctx.newPage();
   failPage = page;

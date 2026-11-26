@@ -6,6 +6,7 @@ import { formatMonth, monthRange, todayISO } from '../../lib/dates';
 import type { InvoiceBalance } from '../../lib/types';
 import { EmptyState } from '../../ui/EmptyState';
 import { InvoiceRow } from '../../ui/InvoiceRow';
+import { useExpenseQueue } from '../../lib/expensesApi';
 
 type BalanceRow = InvoiceBalance;
 
@@ -65,6 +66,7 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub?:
 export function HomePage() {
   const today = todayISO();
   const q = useDashboard();
+  const queued = useExpenseQueue();
   const d = q.data;
   const dash = '—';
 
@@ -79,6 +81,12 @@ export function HomePage() {
         <p className="alert alert-error" role="alert">
           Couldn't load your figures. {friendlyError(q.error)}
         </p>
+      ) : null}
+
+      {queued.length > 0 ? (
+        <Link to="/expenses" className="alert alert-warn block">
+          {queued.length === 1 ? '1 expense is' : `${queued.length} expenses are`} saved on this phone, waiting to upload.
+        </Link>
       ) : null}
 
       <div className="tiles" aria-busy={q.isPending}>
