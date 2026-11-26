@@ -8,7 +8,9 @@ DB="${EDRAM_TEST_DB:-edram_test}"
 dropdb --if-exists "$DB"
 createdb "$DB"
 psql -d "$DB" -v ON_ERROR_STOP=1 -q -f supabase/tests/supabase_stub.sql
-psql -d "$DB" -v ON_ERROR_STOP=1 -q -f supabase/migrations/0001_init.sql
+for m in supabase/migrations/*.sql; do   # in order: 0001, 0002, ...
+  psql -d "$DB" -v ON_ERROR_STOP=1 -q -f "$m"
+done
 out="$(psql -d "$DB" -f supabase/tests/db_tests.sql 2>&1)" || true
 echo "$out"
 if [[ "$(echo "$out" | tail -n 1)" != "ALL TESTS PASSED" ]]; then

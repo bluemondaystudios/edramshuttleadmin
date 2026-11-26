@@ -92,12 +92,11 @@ end $$;
 insert into expenses (id, amount_cents, category, vehicle_id, supplier, receipt_path) values
   ('f0000000-0000-0000-0000-000000000001', 120050, 'fuel', 'd0000000-0000-0000-0000-000000000001', 'Engen Gezina', '2026/11/f0000000-0000-0000-0000-000000000001.jpg'),
   ('f0000000-0000-0000-0000-000000000002', 9900, 'tolls', null, 'SANRAL', null);
-do $$ declare n int; begin
-  delete from expenses where id = 'f0000000-0000-0000-0000-000000000002';
-  get diagnostics n = row_count;
-  assert n = 0, 'expenses must not be hard-deletable';
+select pg_temp.expect_error($q$ delete from expenses where id = 'f0000000-0000-0000-0000-000000000002' $q$, 'permission denied');
+do $$ begin
   update expenses set deleted_at = now() where id = 'f0000000-0000-0000-0000-000000000002';
-  raise notice 'ok, expense hard delete refused (0 rows), soft delete works';
+  assert (select deleted_at from expenses where id = 'f0000000-0000-0000-0000-000000000002') is not null, 'soft delete should work';
+  raise notice 'ok, expense hard delete refused, soft delete works';
 end $$;
 select entry_date = current_date as today, kind, amount_cents, reference, party, category from ledger order by kind;
 
@@ -110,10 +109,12 @@ do $$ declare n int; begin
   raise notice 'ok, receipt upload works, delete refused (0 rows)';
 end $$;
 
+select pg_temp.expect_error($q$ select * from invoice_counter $q$, 'permission denied');
+select pg_temp.expect_error($q$ update invoice_counter set last_seq = 0 $q$, 'permission denied');
+select pg_temp.expect_error($q$ delete from audit_log $q$, 'permission denied');
 do $$ begin
-  assert (select count(*) from invoice_counter) = 0, 'counter must be hidden from clients';
   assert (select count(*) from audit_log) > 10, 'audit log should have entries';
-  raise notice 'ok, counter hidden; audit log has % entries', (select count(*) from audit_log);
+  raise notice 'ok, audit log has % entries', (select count(*) from audit_log);
 end $$;
 
 -- ===== As team member B: sees the same data =====
@@ -140,10 +141,9 @@ select pg_temp.expect_error($q$ insert into storage.objects (bucket_id, name) va
 reset role;
 set role anon;
 select set_config('request.jwt.claim.sub', '', false);
-do $$ begin
-  assert (select count(*) from invoices) = 0, 'anon must see nothing';
-  raise notice 'ok, anonymous visitor sees nothing';
-end $$;
+select pg_temp.expect_error($q$ select count(*) from invoices $q$, 'permission denied');
+select pg_temp.expect_error($q$ select count(*) from customers $q$, 'permission denied');
+select pg_temp.expect_error($q$ insert into customers (name) values ('x') $q$, 'permission denied');
 select pg_temp.expect_error($q$ select issue_invoice('10000000-0000-0000-0000-000000000002') $q$, 'permission denied');
 reset role;
 \echo ALL TESTS PASSED

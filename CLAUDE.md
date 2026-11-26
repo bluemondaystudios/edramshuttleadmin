@@ -117,7 +117,8 @@ edramshuttleadmin/
     styles/tokens.css, base.css
   supabase/
     migrations/0001_init.sql    ← Appendix A, verbatim
-    tests/supabase_stub.sql     ← Appendix B
+    migrations/0002_grants.sql  ← table rights for signed-in users (see section 17)
+    tests/supabase_stub.sql     ← Appendix B (updated: grants nothing by default, like new projects)
     tests/db_tests.sql          ← Appendix B
   .github/workflows/deploy.yml  ← test, build, deploy to Pages
   .env.example                  ← variable names only, no values
@@ -305,7 +306,8 @@ The developer does steps 1–3 and 5–6, which need their accounts. The buildin
 2. **GitHub:** create the public repo `bluemondaystudios/edramshuttleadmin` and add this file as `CLAUDE.md`. Settings → Pages → Source: **GitHub Actions**.
 3. **DNS:** add a **CNAME record**: host `admin`, value `bluemondaystudios.github.io`. Then in the repo, Settings → Pages → Custom domain: `admin.edramshuttle.co.za`. With Actions deployments, the custom domain comes from this setting, not a CNAME file. Tick **Enforce HTTPS** once the certificate is issued.
 4. **Database:**
-   - Apply `supabase/migrations/0001_init.sql`, through the SQL editor, or with `supabase db push` if a Supabase access token is available.
+   - Apply `supabase/migrations/0001_init.sql`, then `0002_grants.sql`, through the SQL editor, or with `supabase db push` if a Supabase access token is available.
+   - `0002_grants.sql` exists because newer Supabase projects no longer open tables to signed-in users automatically (the app gets "permission denied for table/view …" without it). It grants exactly what the app needs to `authenticated`, and nothing to `anon`; RLS still limits rows to team members. Add grants for any new table or view in later migrations.
    - Then run, with the two real user ids:
      ```sql
      insert into public.team_members (user_id, display_name) values
