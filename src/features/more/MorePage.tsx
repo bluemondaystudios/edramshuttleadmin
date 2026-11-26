@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { useAuth } from '../auth/AuthProvider';
 import { signOut } from '../auth/signOut';
 import { Icon, type IconName } from '../../ui/Icon';
 
-const ITEMS: { label: string; icon: IconName }[] = [
-  { label: 'Customers', icon: 'users' },
-  { label: 'Vehicles', icon: 'van' },
+const ITEMS: { label: string; icon: IconName; to?: string; hint?: string }[] = [
+  { label: 'Customers', icon: 'users', to: '/customers' },
+  { label: 'Vehicles', icon: 'van', to: '/vehicles' },
+  { label: 'Settings', icon: 'settings', to: '/settings', hint: 'Business and bank details' },
   { label: 'Reports and export', icon: 'chart' },
   { label: 'Backup', icon: 'download' },
-  { label: 'Settings', icon: 'settings' },
 ];
 
 export function MorePage() {
@@ -25,15 +26,28 @@ export function MorePage() {
       <ul className="list card">
         {ITEMS.map((item) => (
           <li key={item.label}>
-            <div className="list-row is-disabled" aria-disabled="true">
-              <span className="list-icon">
-                <Icon name={item.icon} />
-              </span>
-              <span className="list-main">
-                <strong>{item.label}</strong>
-              </span>
-              <span className="muted small">Soon</span>
-            </div>
+            {item.to ? (
+              <Link to={item.to} className="list-row">
+                <span className="list-icon">
+                  <Icon name={item.icon} />
+                </span>
+                <span className="list-main">
+                  <strong>{item.label}</strong>
+                  {item.hint ? <span className="muted small">{item.hint}</span> : null}
+                </span>
+                <Icon name="chevron" className="muted" />
+              </Link>
+            ) : (
+              <div className="list-row is-disabled" aria-disabled="true">
+                <span className="list-icon">
+                  <Icon name={item.icon} />
+                </span>
+                <span className="list-main">
+                  <strong>{item.label}</strong>
+                </span>
+                <span className="muted small">Soon</span>
+              </div>
+            )}
           </li>
         ))}
       </ul>

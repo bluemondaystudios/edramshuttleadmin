@@ -33,7 +33,13 @@ export default defineConfig({
         // App shell only. Data always comes from Supabase over the network.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Only the Latin font files: the browser fetches other scripts on demand if ever needed.
-        globIgnores: ['**/montserrat-{cyrillic,cyrillic-ext,vietnamese}-*'],
+        globIgnores: [
+          '**/montserrat-{cyrillic,cyrillic-ext,vietnamese}-*',
+          // jsPDF's optional HTML-rendering helpers: never used by the app
+          '**/html2canvas-*',
+          '**/purify.es-*',
+          '**/index.es-*',
+        ],
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
       },

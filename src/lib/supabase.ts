@@ -33,5 +33,9 @@ export function friendlyError(error: unknown): string {
   if (/failed to fetch|network|load failed/i.test(message)) return "Couldn't reach the server. Check your signal or Wi-Fi and try again.";
   if (/email not confirmed/i.test(message)) return 'This account has not been confirmed yet. Ask the developer to confirm it in Supabase.';
   if (/rate limit|too many/i.test(message)) return 'Too many attempts. Wait a minute, then try again.';
+  if (/JSON object requested|multiple \(or no\) rows|PGRST116/i.test(message)) return "That record wasn't found or has already changed. Go back, refresh and try again.";
+  if (/row-level security|permission denied|not allowed/i.test(message)) return "Your account isn't allowed to do that. Ask the developer to check your access.";
+  if (/JWT expired|invalid jwt|refresh token/i.test(message)) return 'You were signed out. Sign in again, then retry.';
+  // Messages raised by the database rules are already written in plain language.
   return message || 'Something went wrong. Please try again.';
 }

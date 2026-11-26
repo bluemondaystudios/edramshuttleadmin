@@ -44,4 +44,12 @@ for (const [file, size, opts] of icons) {
   await page.screenshot({ path: file, omitBackground: false });
   console.log('wrote', file);
 }
+
+// Van on a transparent background, for the invoice PDF header.
+await page.setViewportSize({ width: 256, height: 160 });
+await page.setContent(`<html><head><style>html,body{margin:0;background:transparent}</style></head><body>
+  <svg xmlns="http://www.w3.org/2000/svg" width="256" height="160" viewBox="0 0 64 40">${VAN}</svg></body></html>`);
+mkdirSync('src/assets', { recursive: true });
+await page.screenshot({ path: 'src/assets/van-green.png', omitBackground: true });
+console.log('wrote src/assets/van-green.png');
 await browser.close();

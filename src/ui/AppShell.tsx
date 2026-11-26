@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useNavigate } from 'react-router';
 import { Icon, type IconName } from './Icon';
 import { Logo } from './Logo';
 import { Sheet } from './Sheet';
@@ -12,10 +12,10 @@ const TABS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/more', label: 'More', icon: 'more' },
 ];
 
-const QUICK_ACTIONS: { label: string; hint: string; icon: IconName }[] = [
-  { label: 'New invoice', hint: 'Coming in the invoices update', icon: 'invoice' },
+const QUICK_ACTIONS: { label: string; hint: string; icon: IconName; to?: string }[] = [
+  { label: 'New invoice', hint: 'Bill a customer', icon: 'invoice', to: '/invoices/new' },
+  { label: 'Record payment', hint: 'Money received for an invoice', icon: 'cash', to: '/invoices?filter=unpaid&for=payment' },
   { label: 'Log expense', hint: 'Coming in the expenses update', icon: 'receipt' },
-  { label: 'Record payment', hint: 'Coming in the invoices update', icon: 'cash' },
 ];
 
 function TabLink({ to, label, icon, end }: (typeof TABS)[number]) {
@@ -29,6 +29,7 @@ function TabLink({ to, label, icon, end }: (typeof TABS)[number]) {
 
 export function AppShell() {
   const online = useOnline();
+  const navigate = useNavigate();
   const [quickOpen, setQuickOpen] = useState(false);
   const [first, second, third, fourth] = TABS as [typeof TABS[number], typeof TABS[number], typeof TABS[number], typeof TABS[number]];
 
@@ -75,7 +76,16 @@ export function AppShell() {
         <ul className="action-list">
           {QUICK_ACTIONS.map((a) => (
             <li key={a.label}>
-              <button type="button" className="action-row" disabled>
+              <button
+                type="button"
+                className="action-row"
+                disabled={!a.to}
+                onClick={() => {
+                  if (!a.to) return;
+                  setQuickOpen(false);
+                  navigate(a.to);
+                }}
+              >
                 <span className="action-icon">
                   <Icon name={a.icon} />
                 </span>

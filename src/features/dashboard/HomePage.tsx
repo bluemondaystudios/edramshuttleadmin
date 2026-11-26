@@ -2,18 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { requireSupabase, friendlyError } from '../../lib/supabase';
 import { formatZAR } from '../../lib/money';
-import { formatDate, formatMonth, monthRange, todayISO } from '../../lib/dates';
-import { displayStatus, type InvoiceBalanceRow } from '../../lib/invoiceStatus';
-import { StatusPill } from '../../ui/StatusPill';
+import { formatMonth, monthRange, todayISO } from '../../lib/dates';
+import type { InvoiceBalance } from '../../lib/types';
 import { EmptyState } from '../../ui/EmptyState';
+import { InvoiceRow } from '../../ui/InvoiceRow';
 
-interface BalanceRow extends InvoiceBalanceRow {
-  id: string;
-  number: string | null;
-  customer_name: string;
-  issue_date: string | null;
-  due_date: string | null;
-}
+type BalanceRow = InvoiceBalance;
 
 const BALANCE_COLUMNS = 'id, number, status, customer_name, issue_date, due_date, total_cents, paid_cents, balance_cents, is_overdue';
 
@@ -65,27 +59,6 @@ function Tile({ label, value, sub, tone }: { label: string; value: string; sub?:
       <span className="tile-value">{value}</span>
       {sub ? <span className="tile-sub">{sub}</span> : null}
     </div>
-  );
-}
-
-function InvoiceRow({ row }: { row: BalanceRow }) {
-  const status = displayStatus(row);
-  return (
-    <li>
-      <Link to={`/invoices/${row.id}`} className="list-row">
-        <span className="list-main">
-          <strong className={status === 'void' ? 'struck' : undefined}>{row.number ?? 'Draft'}</strong>
-          <span className="muted small">
-            {row.customer_name}
-            {row.issue_date ? ` · ${formatDate(row.issue_date)}` : ''}
-          </span>
-        </span>
-        <span className="list-side">
-          <span className="amount">{formatZAR(Number(row.total_cents))}</span>
-          <StatusPill status={status} />
-        </span>
-      </Link>
-    </li>
   );
 }
 
@@ -148,7 +121,10 @@ export function HomePage() {
           </ul>
         ) : d ? (
           <EmptyState icon="invoice" title="No invoices yet">
-            Your invoices will show up here. Tap <strong>＋</strong> to create one once invoicing is switched on.
+            <p>Your invoices will show up here.</p>
+            <Link to="/invoices/new" className="btn btn-primary">
+              New invoice
+            </Link>
           </EmptyState>
         ) : null}
       </section>
