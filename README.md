@@ -37,7 +37,8 @@ issues, shares, records a payment, duplicates and voids, checking each step and 
 ```bash
 VITE_SUPABASE_URL=https://demo.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=demo npx vite build --outDir /tmp/edram-e2e
 npx vite preview --outDir /tmp/edram-e2e --port 4173 &
-node e2e/flow.cjs /tmp/edram-screens     # ends with: E2E FLOW PASSED
+node e2e/flow.cjs /tmp/edram-screens       # invoices; ends with: E2E FLOW PASSED
+node e2e/expenses.cjs /tmp/edram-screens   # expenses, incl. flight mode; ends with: E2E EXPENSES PASSED
 ```
 
 It needs Playwright installed globally, so it isn't part of CI. To look at sample PDFs:
