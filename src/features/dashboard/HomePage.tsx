@@ -7,6 +7,8 @@ import type { InvoiceBalance } from '../../lib/types';
 import { EmptyState } from '../../ui/EmptyState';
 import { InvoiceRow } from '../../ui/InvoiceRow';
 import { useExpenseQueue } from '../../lib/expensesApi';
+import { useSettings } from '../../lib/api';
+import { backupDue, daysSinceBackup } from '../../lib/backupReminder';
 
 type BalanceRow = InvoiceBalance;
 
@@ -67,7 +69,11 @@ export function HomePage() {
   const today = todayISO();
   const q = useDashboard();
   const queued = useExpenseQueue();
+  const settings = useSettings();
   const d = q.data;
+  const hasRecords = !!d && (d.recent.length > 0 || d.spent > 0 || d.received > 0);
+  const lastBackup = settings.data?.last_backup_at ?? null;
+  const showBackup = hasRecords && !!settings.data && backupDue(lastBackup);
   const dash = '—';
 
   return (
@@ -81,6 +87,12 @@ export function HomePage() {
         <p className="alert alert-error" role="alert">
           Couldn't load your figures. {friendlyError(q.error)}
         </p>
+      ) : null}
+
+      {showBackup ? (
+        <Link to="/backup" className="alert alert-warn block banner-link">
+          <strong>{lastBackup ? `Last backup was ${daysSinceBackup(lastBackup)} days ago.` : "You haven't made a backup yet."}</strong> Tap to download everything and keep a copy safe.
+        </Link>
       ) : null}
 
       {queued.length > 0 ? (

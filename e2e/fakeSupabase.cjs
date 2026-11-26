@@ -15,6 +15,8 @@ function createFakeSupabase({ today }) {
       payment_terms_days: 7, invoice_footer: 'Reliable • Safe • On-Time • Professional', financial_year_start_month: 3, last_backup_at: null, updated_at: '2026-01-01T00:00:00Z',
     }],
     customers: [], vehicles: [], invoices: [], invoice_lines: [], payments: [], expenses: [],
+    team_members: [{ user_id: '00000000-0000-0000-0000-00000000000a', display_name: 'Owner', created_at: '2026-01-01T00:00:00Z' }],
+    audit_log: [],
   };
   let counter = 0;
   const now = () => new Date().toISOString();
@@ -175,6 +177,12 @@ function createFakeSupabase({ today }) {
           ? { path: p, signedURL: `/object/sign/${signBatch[1]}/${p}?token=fake`, error: null }
           : { path: p, signedURL: null, error: 'Object not found' })));
       }
+      const objGet = /^\/storage\/v1\/object\/(?!sign\/)([^/]+)\/(.+)$/.exec(path);
+      if (method === 'GET' && objGet) {
+        const obj = storage.get(`${objGet[1]}/${decodeURIComponent(objGet[2])}`);
+        if (!obj) return json(400, { statusCode: '404', error: 'not_found', message: 'Object not found' });
+        return { status: 200, body: obj.bytes, contentType: obj.contentType };
+      }
       const upload = /^\/storage\/v1\/object\/([^/]+)\/(.+)$/.exec(path);
       if ((method === 'POST' || method === 'PUT') && upload) {
         const key = `${upload[1]}/${decodeURIComponent(upload[2])}`;
@@ -215,8 +223,9 @@ function createFakeSupabase({ today }) {
       if (method === 'GET') {
         let rows = tableRows(name).filter((r) => filters.every((f) => f(r)));
         rows = applyOrder(rows, u.searchParams.get('order'));
+        const offset = Number(u.searchParams.get('offset') ?? 0);
         const limit = u.searchParams.get('limit');
-        if (limit) rows = rows.slice(0, Number(limit));
+        rows = rows.slice(offset, limit ? offset + Number(limit) : undefined);
         return finish(embed(rows.map((r) => ({ ...r })), select));
       }
       if (method === 'POST') {
