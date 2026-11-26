@@ -1,7 +1,7 @@
 {
   "name": "edram-admin",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,11 +14,16 @@
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.3.0",
+    "@hookform/resolvers": "^7.0.9",
     "@supabase/supabase-js": "^2.119.2",
     "@tanstack/react-query": "^5.108.4",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.9",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router": "^8.5.3"
+    "react-hook-form": "^7.92.0",
+    "react-router": "^8.5.3",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.11",

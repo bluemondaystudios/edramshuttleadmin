@@ -13,6 +13,7 @@ grant usage on schema public, auth, storage to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
 grant all on storage.objects to anon, authenticated;
 grant select on storage.buckets to anon, authenticated;
--- Supabase grants table rights to these roles by default; RLS is what protects data
-alter default privileges in schema public grant all on tables to anon, authenticated;
-alter default privileges in schema public grant all on sequences to anon, authenticated;
+-- New Supabase projects no longer grant table rights to anon/authenticated automatically:
+-- every table and view must be granted explicitly (see migrations/0002_grants.sql).
+-- So this stub grants nothing on public tables, and functions are not executable by PUBLIC.
+alter default privileges in schema public revoke execute on functions from public;
