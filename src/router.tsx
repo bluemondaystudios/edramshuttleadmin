@@ -14,6 +14,8 @@ import { CustomersPage } from './features/customers/CustomersPage';
 import { CustomerDetail } from './features/customers/CustomerDetail';
 import { VehiclesPage } from './features/vehicles/VehiclesPage';
 import { SettingsPage } from './features/settings/SettingsPage';
+import { ReportsPage } from './features/reports/ReportsPage';
+import { BackupPage } from './features/backup/BackupPage';
 
 // The PDF library is large, so the invoice detail screen (which builds PDFs) loads on first use.
 const InvoiceDetail = lazy(() => import('./features/invoices/InvoiceDetail'));
@@ -44,6 +46,8 @@ export const router = createHashRouter([
       { path: 'customers/:id', element: <CustomerDetail /> },
       { path: 'vehicles', element: <VehiclesPage /> },
       { path: 'settings', element: <SettingsPage /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: 'backup', element: <BackupPage /> },
       { path: 'expenses', element: <ExpensesPage /> },
       { path: 'expenses/new', element: <LogExpensePage /> },
       { path: 'expenses/:id', element: <ExpenseDetail /> },

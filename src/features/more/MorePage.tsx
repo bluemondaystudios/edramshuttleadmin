@@ -8,8 +8,8 @@ const ITEMS: { label: string; icon: IconName; to?: string; hint?: string }[] = [
   { label: 'Customers', icon: 'users', to: '/customers' },
   { label: 'Vehicles', icon: 'van', to: '/vehicles' },
   { label: 'Settings', icon: 'settings', to: '/settings', hint: 'Business and bank details' },
-  { label: 'Reports and export', icon: 'chart' },
-  { label: 'Backup', icon: 'download' },
+  { label: 'Reports and export', icon: 'chart', to: '/reports', hint: 'Tax-year totals and the pack for SARS' },
+  { label: 'Backup', icon: 'download', to: '/backup', hint: 'Download everything' },
 ];
 
 export function MorePage() {

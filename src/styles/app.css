@@ -319,3 +319,19 @@ input[type='date'].input { min-width: 0; -webkit-appearance: none; appearance: n
 .thumb-empty { border: 1px dashed var(--line); }
 .pill-inline { justify-self: start; margin-top: 2px; font-size: 0.72rem; }
 .filters { align-items: stretch; }
+
+/* ======================================================================
+   Phase 3: reports, exports, backup
+   ====================================================================== */
+.bar { display: block; height: 6px; margin-top: 6px; border-radius: 999px; background: var(--off-white); overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 999px; background: var(--green); }
+.bar-row .list-main > .bar { white-space: normal; }
+.export-card { padding: 16px; gap: 12px; }
+.progress { display: grid; gap: 6px; }
+.progress-bar { height: 10px; border-radius: 999px; background: var(--off-white); overflow: hidden; }
+.progress-bar > span { display: block; height: 100%; background: var(--green); transition: width 200ms ease; }
+.backup-status { display: grid; gap: 2px; padding: 16px; border-top: 4px solid var(--green); }
+.backup-status.is-due { border-top-color: var(--amber); }
+.backup-when { font-size: 1.4rem; font-weight: 800; }
+.plain-list { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.banner-link { text-decoration: none; }

@@ -39,6 +39,7 @@ VITE_SUPABASE_URL=https://demo.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=demo np
 npx vite preview --outDir /tmp/edram-e2e --port 4173 &
 node e2e/flow.cjs /tmp/edram-screens       # invoices; ends with: E2E FLOW PASSED
 node e2e/expenses.cjs /tmp/edram-screens   # expenses, incl. flight mode; ends with: E2E EXPENSES PASSED
+node e2e/records.cjs /tmp/edram-screens    # reports, export pack, backup; ends with: E2E RECORDS PASSED
 ```
 
 It needs Playwright installed globally, so it isn't part of CI. To look at sample PDFs:
